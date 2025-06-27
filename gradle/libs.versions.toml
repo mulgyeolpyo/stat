@@ -1,0 +1,19 @@
+[versions]
+kotlin = "2.1.0"
+dokka = "2.0.0"
+paper = "1.20.1-R0.1-SNAPSHOT"
+paperweight = "1.7.7"
+coroutines = "1.10.1"
+json = "1.8.0"
+protobuf = "1.8.0"
+tap = "4.9.3"
+
+[libraries]
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+coroutines = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-core", version.ref = "coroutines" }
+tap = { group = "io.github.monun", name = "tap-core", version.ref = "tap" }
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
