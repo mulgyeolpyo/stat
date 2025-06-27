@@ -10,6 +10,7 @@ import java.lang.reflect.Modifier
 import java.net.URLClassLoader
 import java.util.jar.JarFile
 
+@Suppress("unused")
 class StatEventManagerImpl(
     private val manager: GlobalStatManager,
     plugin: JavaPlugin? = null,

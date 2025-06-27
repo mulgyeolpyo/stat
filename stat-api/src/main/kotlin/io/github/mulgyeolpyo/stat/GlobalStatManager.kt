@@ -14,6 +14,7 @@ import java.util.UUID
  * This interface provides access to stat configurations, event management, and player-specific stat data.
  * It acts as a facade for various sub-managers and handles the lifecycle of stats.
  */
+@Suppress("unused")
 interface GlobalStatManager {
     /**
      * Provides an accessible singleton instance of [GlobalStatManager] through a static companion object.
@@ -126,6 +127,7 @@ interface GlobalStatManager {
  * This interface abstracts the instantiation logic, allowing the manager to be initialized
  * with or without a direct [JavaPlugin] reference.
  */
+@Suppress("unused")
 interface GlobalStatManagerInternal {
     /**
      * Creates a new instance of [GlobalStatManager] with a specified [JavaPlugin].

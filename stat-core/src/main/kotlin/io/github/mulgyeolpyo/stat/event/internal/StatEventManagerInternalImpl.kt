@@ -6,6 +6,7 @@ import io.github.mulgyeolpyo.stat.event.StatEventManagerInternal
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
+@Suppress("unused")
 class StatEventManagerInternalImpl : StatEventManagerInternal {
     override fun create(
         manager: GlobalStatManager,

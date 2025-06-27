@@ -6,6 +6,7 @@ import io.github.mulgyeolpyo.stat.config.StatConfig
 import io.github.mulgyeolpyo.stat.config.StatConfigManager
 import java.io.File
 
+@Suppress("unused")
 class StatConfigManagerImpl(
     private val manager: GlobalStatManager,
     dataFolder: File? = null,

@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.UUID
 
+@Suppress("unused")
 class GlobalStatManagerImpl(
     plugin: JavaPlugin? = null,
     dataFolder: File? = null,

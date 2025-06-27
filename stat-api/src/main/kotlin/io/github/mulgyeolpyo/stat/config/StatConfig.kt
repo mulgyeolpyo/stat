@@ -8,6 +8,7 @@ import kotlin.random.Random
  * Represents the configuration for a specific stat, such as its level range,
  * growth rate, and initial values.
  */
+@Suppress("unused")
 class StatConfig {
     /**
      * The minimum possible level for the stat.

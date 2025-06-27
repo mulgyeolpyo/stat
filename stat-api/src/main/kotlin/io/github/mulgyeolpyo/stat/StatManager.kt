@@ -5,6 +5,7 @@ package io.github.mulgyeolpyo.stat
  * This interface provides methods to get, set, modify, and persist a player's stats.
  * Each instance of [StatManager] is typically associated with one player's stat data.
  */
+@Suppress("unused")
 interface StatManager {
     /**
      * Unregisters a specific stat from this manager.

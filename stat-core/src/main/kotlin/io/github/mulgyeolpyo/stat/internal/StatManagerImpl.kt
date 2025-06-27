@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 
+@Suppress("unused")
 class StatManagerImpl(
     private val manager: GlobalStatManagerImpl,
     private val playerId: UUID,

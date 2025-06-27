@@ -8,6 +8,7 @@ import java.io.File
  * Manages the registration, loading, and enabling/disabling of stat-specific event listeners.
  * This manager is responsible for handling [StatEventListener] classes, including those loaded from external JAR files.
  */
+@Suppress("unused")
 interface StatEventManager {
     companion object : StatEventManagerInternal by io.github.mulgyeolpyo.stat.loader.LibraryLoader.loadImplement(
         StatEventManagerInternal::class.java,

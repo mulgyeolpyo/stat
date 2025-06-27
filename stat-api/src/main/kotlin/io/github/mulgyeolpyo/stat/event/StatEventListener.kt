@@ -22,6 +22,7 @@ import java.util.UUID
  * @property stat The name of the stat this listener is associated with. If null, it's derived from the class name.
  * @property manager The [GlobalStatManager] instance used to access and manipulate player stats.
  */
+@Suppress("unused")
 open class StatEventListener(
     stat: String? = null,
     val manager: GlobalStatManager,

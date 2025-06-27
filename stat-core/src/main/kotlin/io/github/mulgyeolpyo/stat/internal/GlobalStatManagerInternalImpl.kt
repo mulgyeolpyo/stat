@@ -4,6 +4,7 @@ import io.github.mulgyeolpyo.stat.GlobalStatManager
 import io.github.mulgyeolpyo.stat.GlobalStatManagerInternal
 import org.bukkit.plugin.java.JavaPlugin
 
+@Suppress("unused")
 class GlobalStatManagerInternalImpl : GlobalStatManagerInternal {
     override fun create(plugin: JavaPlugin): GlobalStatManager = GlobalStatManagerImpl(plugin)
 

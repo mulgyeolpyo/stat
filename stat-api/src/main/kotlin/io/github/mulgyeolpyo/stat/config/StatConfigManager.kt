@@ -9,6 +9,7 @@ import java.io.File
  * Manages the loading, saving, and retrieval of stat configurations for various stats.
  * This manager handles the persistence of [StatConfig] objects to and from files.
  */
+@Suppress("unused")
 interface StatConfigManager {
     /**
      * Provides an accessible singleton instance of [StatConfigManager] through a static companion object.
@@ -86,6 +87,7 @@ interface StatConfigManager {
  * This interface abstracts the instantiation logic, allowing different ways
  * to initialize the manager (e.g., with a plugin's data folder or a custom file path).
  */
+@Suppress("unused")
 interface StatConfigManagerInternal {
     /**
      * Creates a new instance of [StatConfigManager] using the data folder of a provided [JavaPlugin].

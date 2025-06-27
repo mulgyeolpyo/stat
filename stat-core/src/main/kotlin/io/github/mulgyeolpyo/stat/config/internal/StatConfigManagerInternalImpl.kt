@@ -6,6 +6,7 @@ import io.github.mulgyeolpyo.stat.config.StatConfigManagerInternal
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
+@Suppress("unused")
 class StatConfigManagerInternalImpl : StatConfigManagerInternal {
     override fun create(
         manager: GlobalStatManager,
