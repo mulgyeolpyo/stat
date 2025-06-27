@@ -1,12 +1,7 @@
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
-repositories {
-    mavenLocal()
-}
-
 dependencies {
-    implementation("io.github.mulgyeolpyo:stat-api:1.0.0")
-    // implementation(projectApi)
+    implementation(projectApi)
 }
 
 extra.apply {
