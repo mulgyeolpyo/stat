@@ -99,14 +99,12 @@ class StatConfig {
         if (value < this.levels.first()) return 0
         if (value >= this.levels.last()) return this.max
 
-        // Find the highest level threshold that the value has surpassed.
         for ((level, require) in this.levels.withIndex()) {
             if (value < require) {
                 return level
             }
         }
 
-        // This line should be unreachable due to the boundary checks above.
         return this.max
     }
 }

@@ -54,7 +54,6 @@ class StatConfigManagerImpl(
         ConfigSupport.compute(config, File(File(this.dataFolder, stat), "stat.yml"), separateByClass = true)
         config.default = config.default
 
-        // this.configs[stat] = config
         this.set(stat, config)
         return config
     }
@@ -62,11 +61,6 @@ class StatConfigManagerImpl(
     override fun load() {
         for (stat in this.manager.stats) {
             this.load(stat)
-//            val config = StatConfig()
-//            ConfigSupport.compute(config, File(this.dataFolder, "$stat.yml"), separateByClass = true)
-//            config.levels = config.calculateLevels()
-//
-//            this.stats[stat] = config
         }
     }
 
@@ -83,10 +77,6 @@ class StatConfigManagerImpl(
     override fun save() {
         for (stat in this.configs.keys) {
             this.save(stat)
-//            val file = File(this.dataFolder, "$stat.yml")
-//            file.delete()
-//
-//            ConfigSupport.compute(config, file, separateByClass = true)
         }
     }
 }

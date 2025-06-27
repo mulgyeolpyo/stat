@@ -61,11 +61,6 @@ class StatEventManagerImpl(
         }
     }
 
-//    fun get(stat: String): List<Class<out StatEventListener>> {
-//        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-//        return this.events[stat] ?: load(stat)
-//    }
-
     override fun enable(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
         this.events[stat]?.forEach { event ->
@@ -77,8 +72,6 @@ class StatEventManagerImpl(
         stat: String,
         event: Class<out StatEventListener>,
     ) {
-//        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
         try {
             val listener: StatEventListener =
                 try {

@@ -18,12 +18,6 @@ class StatManagerImpl(
         this.load()
     }
 
-//    override fun register(stat: String) {
-//        require(!this.stats.containsKey(stat)) { "스탯 '$stat'이 이미 존재합니다." }
-//        this.stats[stat] = 0.0f
-//        this.load(stat)
-//    }
-
     override fun unregister(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
         if (stat in this.values.keys) {
@@ -107,12 +101,6 @@ class StatManagerImpl(
     override fun load() {
         for (stat in this.manager.stats) {
             this.load(stat)
-//            val value =
-//                Bukkit
-//                    .getPlayer(playerId)
-//                    ?.persistentData
-//                    ?.get(stat, PersistentDataType.FLOAT) ?: 0.0f
-//            this.stats[stat] = value
         }
     }
 
@@ -128,10 +116,6 @@ class StatManagerImpl(
     override fun save() {
         for (stat in this.values.keys) {
             this.save(stat)
-//            Bukkit
-//                .getPlayer(playerId)
-//                ?.persistentData
-//                ?.set(stat, PersistentDataType.FLOAT, value)
         }
     }
 }
