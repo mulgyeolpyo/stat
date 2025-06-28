@@ -8,8 +8,10 @@
 
 <hr>
 
-[[ **<u>English</u>** ]](../README.md)　|　[[ **<u>한국어</u>** ]](ko-KR.md) <br>
+[**<u>English</u>**](../README.md)　|　[**<u>한국어</u>**](ko-KR.md) <br>
 _모든 🌏영문 번역은 AI로 진행되어 부정확한 부분이 존재할 수 있습니다._
+
+
 
 <hr>
 
@@ -87,7 +89,7 @@ val strengthStat = playerStats.getStat(stat = "strength") // "strength"라는 �
 ### 4. 스탯 설정 접근
 ```kotlin
 /*
-    스탯 설정은 GlobalStatManager를 통한 접근이 가능합니다
+    스탯 설정은 GlobalStatManager를 통한 접근이 가능합니다.
  */
 val statConfig = globalStatManager.getStatConfig(stat = "strength") // "strength"라는 이름의 스탯 설정을 가져옵니다.
 
