@@ -8,8 +8,8 @@
 
 <hr>
 
-[[ <u>English</u> ]](README.md)　|　[[ <u>한국어</u> ]](docs/ko-KR.md) <br>
-_**Note: The 🌏English translation is machine-generated and may contain errors.**_
+[[ **<u>English</u>** ]](README.md)　|　[[ **<u>한국어</u>** ]](docs/ko-KR.md) <br>
+_Note: The 🌏English translation is machine-generated and may contain errors._
 
 <hr>
 
