@@ -130,6 +130,19 @@ interface GlobalStatManager {
 @Suppress("unused")
 interface GlobalStatManagerInternal {
     /**
+     * Creates a new instance of [GlobalStatManager] with a specified [JavaPlugin] and a custom data folder.
+     * This allows for more flexibility in where stat data is stored, while still associating it with a specific plugin.
+     *
+     * @param plugin The [JavaPlugin] instance associated with this manager.
+     * @param dataFolder The custom directory where stat data will be stored.
+     * @return A new [GlobalStatManager] instance.
+     */
+    fun create(
+        plugin: JavaPlugin,
+        dataFolder: File,
+    ): GlobalStatManager
+
+    /**
      * Creates a new instance of [GlobalStatManager] with a specified [JavaPlugin].
      * The plugin's data folder will be used as the default base directory for stat data.
      *
@@ -139,6 +152,15 @@ interface GlobalStatManagerInternal {
     fun create(plugin: JavaPlugin): GlobalStatManager
 
     /**
+     * Creates a new instance of [GlobalStatManager] with a specified data folder.
+     * This allows for the manager to be initialized without a plugin, focusing solely on the data storage location.
+     *
+     * @param dataFolder The custom directory where stat data will be stored.
+     * @return A new [GlobalStatManager] instance.
+     */
+    fun create(dataFolder: File): GlobalStatManager
+
+    /**
      * Creates a new instance of [GlobalStatManager] without an explicit [JavaPlugin].
      * The associated [JavaPlugin] will be automatically determined (e.g., via `JavaPlugin.getProvidingPlugin`),
      * and its data folder will be used as the base directory for stat data.
@@ -146,4 +168,43 @@ interface GlobalStatManagerInternal {
      * @return A new [GlobalStatManager] instance.
      */
     fun create(): GlobalStatManager
+
+    /**
+     * Creates a new [GlobalStatManager] instance with a specified [JavaPlugin] and data folder.
+     * This is a convenience method that combines creation and loading in one step.
+     *
+     * @param plugin The [JavaPlugin] instance associated with this manager.
+     * @param dataFolder The custom directory where stat data will be stored.
+     * @return A new, loaded [GlobalStatManager] instance.
+     */
+    fun load(
+        plugin: JavaPlugin,
+        dataFolder: File,
+    ): GlobalStatManager
+
+    /**
+     * Creates a new [GlobalStatManager] instance after its [GlobalStatManager.load] method has been called.
+     * This is a convenience method that combines creation and loading in one step.
+     *
+     * @param plugin The [JavaPlugin] instance associated with this manager.
+     * @return A new, loaded [GlobalStatManager] instance.
+     */
+    fun load(plugin: JavaPlugin): GlobalStatManager
+
+    /**
+     * Creates a new [GlobalStatManager] instance with a specified data folder.
+     * This is a convenience method that combines creation and loading in one step.
+     *
+     * @param dataFolder The custom directory where stat data will be stored.
+     * @return A new, loaded [GlobalStatManager] instance.
+     */
+    fun load(dataFolder: File): GlobalStatManager
+
+    /**
+     * Creates a new [GlobalStatManager] instance after its [GlobalStatManager.load] method has been called.
+     * This is a convenience method that combines creation and loading in one step.
+     *
+     * @return A new, loaded [GlobalStatManager] instance.
+     */
+    fun load(): GlobalStatManager
 }

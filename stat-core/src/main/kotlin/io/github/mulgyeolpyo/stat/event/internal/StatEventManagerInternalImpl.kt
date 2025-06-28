@@ -8,6 +8,8 @@ import java.io.File
 
 @Suppress("unused")
 class StatEventManagerInternalImpl : StatEventManagerInternal {
+    val plugin = JavaPlugin.getProvidingPlugin(this.javaClass)
+
     override fun create(
         manager: GlobalStatManager,
         plugin: JavaPlugin,
@@ -22,7 +24,7 @@ class StatEventManagerInternalImpl : StatEventManagerInternal {
     override fun create(
         manager: GlobalStatManager,
         dataFolder: File,
-    ): StatEventManager = StatEventManagerImpl(manager, dataFolder = dataFolder)
+    ): StatEventManager = this.create(manager, this.plugin, dataFolder)
 
-    override fun create(manager: GlobalStatManager): StatEventManager = StatEventManagerImpl(manager)
+    override fun create(manager: GlobalStatManager): StatEventManager = this.create(manager, this.plugin, this.plugin.dataFolder)
 }

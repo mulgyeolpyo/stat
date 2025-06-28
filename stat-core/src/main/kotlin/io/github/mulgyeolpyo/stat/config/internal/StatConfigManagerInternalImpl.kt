@@ -11,12 +11,12 @@ class StatConfigManagerInternalImpl : StatConfigManagerInternal {
     override fun create(
         manager: GlobalStatManager,
         plugin: JavaPlugin,
-    ): StatConfigManager = StatConfigManagerImpl(manager, plugin.dataFolder)
+    ): StatConfigManager = this.create(manager, plugin.dataFolder)
 
     override fun create(
         manager: GlobalStatManager,
         dataFolder: File,
     ): StatConfigManager = StatConfigManagerImpl(manager, dataFolder)
 
-    override fun create(manager: GlobalStatManager): StatConfigManager = StatConfigManagerImpl(manager)
+    override fun create(manager: GlobalStatManager): StatConfigManager = this.create(manager, manager.dataFolder)
 }

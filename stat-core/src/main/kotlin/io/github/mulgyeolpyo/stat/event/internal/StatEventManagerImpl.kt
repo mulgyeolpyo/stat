@@ -13,23 +13,9 @@ import java.util.jar.JarFile
 @Suppress("unused")
 class StatEventManagerImpl(
     private val manager: GlobalStatManager,
-    plugin: JavaPlugin? = null,
-    dataFolder: File? = null,
+    private val plugin: JavaPlugin,
+    private val dataFolder: File,
 ) : StatEventManager {
-    private val plugin: JavaPlugin = plugin ?: JavaPlugin.getProvidingPlugin(this.javaClass)
-    private val dataFolder: File =
-        dataFolder.let {
-            if (it == null) {
-                return@let this@StatEventManagerImpl.manager.dataFolder
-            }
-
-            return@let File(it, "stat").apply {
-                if (!this.exists()) {
-                    this.mkdirs()
-                }
-            }
-        }
-
     private val events = mutableMapOf<String, MutableList<Class<out StatEventListener>>>()
     private val listeners = mutableMapOf<String, MutableList<StatEventListener>>()
 

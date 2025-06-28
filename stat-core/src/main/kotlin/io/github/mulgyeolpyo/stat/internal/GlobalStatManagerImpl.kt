@@ -17,22 +17,19 @@ import java.util.UUID
 
 @Suppress("unused")
 class GlobalStatManagerImpl(
-    plugin: JavaPlugin? = null,
-    dataFolder: File? = null,
+    private val plugin: JavaPlugin,
+    dataFolder: File,
 ) : GlobalStatManager {
-    private val plugin: JavaPlugin = plugin ?: JavaPlugin.getProvidingPlugin(this.javaClass)
-    override val config: StatConfigManager =
-        if (dataFolder == null) {
-            StatConfigManager.create(this, this.plugin)
-        } else {
-            StatConfigManager.create(this, dataFolder)
-        }
-    override val event: StatEventManager =
-        if (dataFolder == null) {
-            StatEventManager.create(this, this.plugin)
-        } else {
-            StatEventManager.create(this, this.plugin, dataFolder)
-        }
+    override val dataFolder: File = dataFolder
+        get() =
+            File(field, "stat").apply {
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+
+    override val config: StatConfigManager = StatConfigManager.create(this, dataFolder)
+    override val event: StatEventManager = StatEventManager.create(this, this.plugin, dataFolder)
 
     private val _stats: MutableList<String> = mutableListOf()
     private val _players: MutableMap<UUID, StatManager> = mutableMapOf()
@@ -41,13 +38,6 @@ class GlobalStatManagerImpl(
         get() = this._stats.toList()
     override val players: Map<UUID, StatManager>
         get() = this._players.toMap()
-
-    override val dataFolder: File =
-        File((dataFolder ?: this.plugin.dataFolder), "stat").apply {
-            if (!this.exists()) {
-                this.mkdirs()
-            }
-        }
 
     init {
         Bukkit.getPluginManager().registerEvents(

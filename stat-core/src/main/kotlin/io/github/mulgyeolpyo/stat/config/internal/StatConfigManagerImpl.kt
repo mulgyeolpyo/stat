@@ -9,21 +9,9 @@ import java.io.File
 @Suppress("unused")
 class StatConfigManagerImpl(
     private val manager: GlobalStatManager,
-    dataFolder: File? = null,
+    private val dataFolder: File,
 ) : StatConfigManager {
     private val configs = mutableMapOf<String, StatConfig>()
-    private val dataFolder: File =
-        dataFolder.let {
-            if (it == null) {
-                return@let this@StatConfigManagerImpl.manager.dataFolder
-            }
-
-            return@let File(it, "stat").apply {
-                if (!this.exists()) {
-                    this.mkdirs()
-                }
-            }
-        }
 
     override fun unregister(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
@@ -51,7 +39,7 @@ class StatConfigManagerImpl(
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
 
         val config = StatConfig()
-        ConfigSupport.compute(config, File(File(this.dataFolder, stat), "stat.yml"), separateByClass = true)
+        ConfigSupport.compute(config, File(this.dataFolder, "stat.yml"), separateByClass = true)
         config.default = config.default
 
         this.set(stat, config)
@@ -67,10 +55,8 @@ class StatConfigManagerImpl(
     override fun save(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
 
-        val file = File(File(this.dataFolder, stat), "$stat.yml")
-        file.delete()
-
         val config = this.configs[stat]
+        val file = File(this.dataFolder, "$stat.yml").apply { delete() }
         ConfigSupport.compute(config!!, file, separateByClass = true)
     }
 
