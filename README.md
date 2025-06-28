@@ -1,4 +1,4 @@
-# 물결표 스튜디오, 스탯 모듈 (only v1.20.1)
+# Mulgyeolpyo Studio, Stat Module (only PaperMC v1.20.1)
 
 [![Java](https://img.shields.io/badge/java-17-ED8B00.svg?logo=java)](https://www.azul.com/)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-585DEF.svg?logo=kotlin)](http://kotlinlang.org)
@@ -6,49 +6,89 @@
 [![GitHub](https://img.shields.io/github/license/seorin21/paper-sample-complex)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Youtube](https://img.shields.io/badge/youtube-서린-red.svg?logo=youtube)](https://www.youtube.com/@seorin._.021)
 
-## 프로젝트 구성하기
+<hr>
+[English](README.md) | [한국어](docs/ko-KR.md) <br>
+_**Note: The 🌏English translation is machine-generated and may contain errors.**_
+<hr>
 
-1. 저장소 복제 `git clone https://github.com/seorin21/paper-sample.git`
-2. 프로젝트 이름 변경 (`settings.gradle.kts` 의 `rootProject.name`)
-3. 구성 태스크 실행 `./gradlew setupModules`
+**For content, for servers,**<br>
+This is a PaperMC library that helps seamlessly manage stats, a commonly used RPG element.
 
----
+### Gradle
+```groovy
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'io.github.mulgyeolpyo:stat-api:'
+}
+```
 
-#### API
+### Maven
+```xml
+<repositories>
+    <repository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+</repositories>
+<dependencies>
+<dependency>
+    <groupId>io.github.mulgyeolpyo</groupId>
+    <artifactId>stat-api</artifactId>
+    <version><version></version></version>
+</dependency>
+</dependencies>
+```
 
-최상위 계층 인터페이스
+## Warning ⚠
+When using this module, you must add the following to your `plugin.yml`.
+```yaml
+libraries:
+  - io.github.mulgyeolpyo:stat-api:<version>
+```
 
----
+## Usage
+### 1. Create a Global Stat Manager
+```kotlin
+val globalStatManager = GlobalStatManager.create(plugin = this) // The plugin instance must be passed to `this`.
+// or 
+val globalStatManager = GlobalStatManager.create() // In this case, it automatically finds the plugin instance.
+```
 
-#### CORE 
+### 2. Add a Stat
+```kotlin
+/* Choose one of the methods below. */
+val stat = globalStatManager.register(stat = statName)
+/* 
+    For the `event` parameter, create a class that references StatEventListener.
+    (StatEventListener is used for convenient stat access)
+    
+    Ex) stat(player).increment(1) // Refer to the StatEventListener.kt file in the 'stat-plugin' folder.
+*/
+val stat = globalStatManager.register(stat = statName, event = StatEventListener::class.java)
+val stat = globalStatManager.register(event = StatEventListener::class.java)
+```
 
-API의 구현, 실제 실행 코드, `net.minecraft.server` 를 참조하는 코드
+### 3. Access a Stat
+```kotlin
+/*
+    For intuitive and easy stat access, you can use StatEventListener.
+    However, if you want to access stats directly, use the method below.
+ */
+val playerStats = globalStatManager.create(player = player)
+val strengthStat = playerStats.getStat(stat = "strength") // Gets the stat named "strength".
 
-하위에 참조할 버전 이름의 프로젝트를 생성 `ex) v1.18`
+// StatEventListener includes code that simplifies this process.
+```
 
----
+### 4. Access Stat Configuration
+```kotlin
+/*
+    Stat configuration can be accessed through the GlobalStatManager.
+ */
+val statConfig = globalStatManager.getStatConfig(stat = "strength") // Gets the configuration for the stat named "strength".
 
-#### PLUGIN
-
-PaperMC 와 상호작용할 JavaPlugin 을 포함한 코드
-
-* `./gradlew devJar` mojang mapped bundler jar
-* `./gradlew reobfJar` reobfusecated bundler jar
-* `./gradlew clipJar` clip jar
-
----
-
-#### PUBLISH
-
-배포용 프로젝트
-
-* `./gradlew publishToMavenLocal -Pdev` 로 로컬 저장소에 mojangmapping 버전의 jar 파일을 배포 가능
-
----
-
-#### 참고
-
-* `api:jar` 태스크를 참조하는 작업 후 `clean` 태스크 실행 불가
-    * (gradle daemon이 api.jar 를 잡고 있음)
-* SNAPSHOT 버전일 경우 `plugin:clipJar` 태스크를 통한 플러그인이 서버에서 실행되지 않음
-    * SNAPSHOT 버전은 항상 mavenCentral 에서 최신 버전을 확인하는데 실제로 서버에 존재하지 않아서 생기는 문제 
+// The feature to modify the stat elements themselves is not yet implemented.
+// For intuitive modification of stat settings, check the default configuration path at '/{pluginDataFolder}/stat/~'.
+```
