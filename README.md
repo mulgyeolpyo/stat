@@ -7,8 +7,10 @@
 [![Youtube](https://img.shields.io/badge/youtube-서린-red.svg?logo=youtube)](https://www.youtube.com/@seorin._.021)
 
 <hr>
-[English](README.md) | [한국어](docs/ko-KR.md) <br>
+
+[[ <u>English</u> ]](README.md)　|　[[ <u>한국어</u> ]](docs/ko-KR.md) <br>
 _**Note: The 🌏English translation is machine-generated and may contain errors.**_
+
 <hr>
 
 **For content, for servers,**<br>
