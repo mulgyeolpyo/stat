@@ -2,12 +2,7 @@ plugins {
     idea
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    alias(libs.plugins.publish) apply false
 }
 
 allprojects {
@@ -32,9 +27,14 @@ subprojects {
     dependencies {
         compileOnly(rootProject.libs.paper)
         implementation(rootProject.libs.tap)
-
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect"))
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -57,7 +57,7 @@ listOf(projectApi, projectCore).forEach { module ->
                 archiveClassifier.set("javadoc")
                 dependsOn("dokkaHtml")
 
-                from("$buildDir/dokka/html/") {
+                from(layout.buildDirectory.dir("dokka/html")) {
                     include("**")
                 }
             }
@@ -68,7 +68,13 @@ listOf(projectApi, projectCore).forEach { module ->
 idea {
     module {
         excludeDirs.add(file(".server"))
-        excludeDirs.addAll(allprojects.map { it.buildDir })
+        excludeDirs.addAll(
+            allprojects.map {
+                it.layout.buildDirectory
+                    .get()
+                    .asFile
+            },
+        )
         excludeDirs.addAll(allprojects.map { it.file(".gradle") })
     }
 }
