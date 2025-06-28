@@ -27,10 +27,7 @@ open class StatEventListener(
     stat: String? = null,
     val manager: GlobalStatManager,
 ) : Listener {
-    /**
-     * The actual stat name determined either by the constructor parameter or derived from the class name.
-     */
-    val stat: String =
+    private val stat: String =
         stat ?: this@StatEventListener::class.java.simpleName
             .removeSuffix("StatEvent")
             .lowercase()
