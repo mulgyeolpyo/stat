@@ -8,6 +8,8 @@
 
 <hr>
 
+Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sample-complex)**
+
 [**<u>English</u>**](README.md)　|　[**<u>한국어</u>**](docs/ko-KR.md)<br>
 <span style="color: #A8AEB7">_Note: The 🌏English translation is machine-generated and may contain errors._</span>
 
@@ -61,7 +63,7 @@ dependencies {
 </dependencies>
 ```
 
-### 주의 ⚠
+### WARNING ⚠
 <span style="color: #ED5466">When using this module, you must add the following to your `plugin.yml`.</span>
 ```yaml
 libraries:

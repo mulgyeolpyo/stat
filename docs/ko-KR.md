@@ -8,6 +8,8 @@
 
 <hr>
 
+Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sample-complex)**
+
 [**<u>English</u>**](../README.md)　|　[**<u>한국어</u>**](ko-KR.md)<br>
 <span style="color: #A8AEB7">_(모든 🌏영문 번역은 AI로 진행되어 부정확한 부분이 존재할 수 있습니다)_</span>
 
@@ -60,7 +62,7 @@ dependencies {
 </dependencies>
 ```
 
-### 주의 ⚠
+### WARNING ⚠
 <span style="color: #ED5466">해당 모듈을 사용할 경우, `plugin.yml`에 반드시 다음을 추가해야 합니다.</span>
 ```yaml
 libraries:
@@ -113,8 +115,3 @@ val statConfig = globalStatManager.getStatConfig(stat = "strength") // "strength
 // 아직 스탯의 요소 자체를 변경하는 기능은 미구현되어 있습니다.
 // 직관적인 스탯 설정 수정을 원하신다면, 기본 설정값인 '/{pluginDataFolder}/stat/~'를 확인해보세요/
 ```
-
-<hr>
-
-### NOTE
-- 본 프로젝트는 [seorin21/paper-sample-complex](https://github.com/seorin21/paper-sample-complex) (Forked by [monun](https://github.com/monun/paper-sample-complex)) 에서 기반되었습니다.
