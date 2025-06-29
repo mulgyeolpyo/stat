@@ -9,7 +9,7 @@ import kotlin.random.Random
  * growth rate, and initial values.
  */
 @Suppress("unused")
-class StatConfig {
+open class StatConfig {
     /**
      * The minimum possible level for the stat.
      * This defines the lower bound of the level range.
