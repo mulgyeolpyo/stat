@@ -85,7 +85,7 @@ interface StatEventManager {
      * @return A list of [StatEventListener] classes found and loaded for the specified stat.
      * @throws IllegalArgumentException if the specified stat does not exist in [GlobalStatManager].
      */
-    fun load(stat: String): List<Class<out StatEventListener>>
+    fun load(stat: String): Class<out StatEventListener>?
 
     /**
      * Loads event listeners for all registered stats from their respective external JAR files.
