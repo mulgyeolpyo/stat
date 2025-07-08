@@ -13,36 +13,39 @@ class StatConfigManagerImpl(
 ) : StatConfigManager {
     private val configs = mutableMapOf<String, StatConfig>()
 
-    override fun unregister(stat: String) {
+    private fun requireValidStat(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        if (stat in this.configs.keys) {
-            this.save(stat)
-        }
+    }
 
-        this.configs.remove(stat)
+    override fun unregister(stat: String) {
+        this.requireValidStat(stat)
+        val config = this.configs.remove(stat) ?: return
+        this.save(stat, config)
     }
 
     override fun get(stat: String): StatConfig {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        return this.configs[stat] ?: load(stat)
+        this.requireValidStat(stat)
+
+        this.configs[stat]?.let { return it }
+        return this.load(stat)
     }
 
     override fun set(
         stat: String,
         config: StatConfig,
     ) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+        this.requireValidStat(stat)
         this.configs[stat] = config
     }
 
     override fun load(stat: String): StatConfig {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
+        this.requireValidStat(stat)
         val config = StatConfig()
-        ConfigSupport.compute(config, File(this.dataFolder, "stat.yml"), separateByClass = true)
-        config.default = config.default
+        ConfigSupport.compute(config, File(this.dataFolder, "stat.yml"), separateByClass = true).let {
+            config.default = config.default
+        }
 
-        this.set(stat, config)
+        this.configs[stat] = config
         return config
     }
 
@@ -52,17 +55,24 @@ class StatConfigManagerImpl(
         }
     }
 
-    override fun save(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
-        val config = this.configs[stat]
+    private fun save(
+        stat: String,
+        config: StatConfig,
+    ) {
         val file = File(this.dataFolder, "$stat.yml").apply { delete() }
-        ConfigSupport.compute(config!!, file, separateByClass = true)
+        ConfigSupport.compute(config, file, separateByClass = true)
+    }
+
+    override fun save(stat: String) {
+        this.requireValidStat(stat)
+        val config = this.configs[stat] ?: return
+        this.save(stat, config)
     }
 
     override fun save() {
-        for (stat in this.configs.keys) {
-            this.save(stat)
+        val configs = this.configs.toMap()
+        configs.forEach { (stat, config) ->
+            this.save(stat, config)
         }
     }
 }

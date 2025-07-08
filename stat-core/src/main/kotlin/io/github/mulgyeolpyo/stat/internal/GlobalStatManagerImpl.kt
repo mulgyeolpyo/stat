@@ -20,6 +20,7 @@ class GlobalStatManagerImpl(
     private val plugin: JavaPlugin,
     dataFolder: File,
 ) : GlobalStatManager {
+    private val lock = Any()
     override val dataFolder: File = dataFolder
         get() =
             File(field, "stat").apply {
@@ -35,9 +36,9 @@ class GlobalStatManagerImpl(
     private val _players: MutableMap<UUID, StatManager> = mutableMapOf()
 
     override val stats: List<String>
-        get() = this._stats.toList()
+        get() = _stats.toList()
     override val players: Map<UUID, StatManager>
-        get() = this._players.toMap()
+        get() = _players.toMap()
 
     init {
         Bukkit.getPluginManager().registerEvents(
@@ -45,14 +46,16 @@ class GlobalStatManagerImpl(
                 @EventHandler
                 fun onDisable(event: PluginDisableEvent) {
                     this@GlobalStatManagerImpl.config.save()
-                    this@GlobalStatManagerImpl._players.forEach { (playerId, manager) -> manager.save() }
+                    synchronized(lock) {
+                        this@GlobalStatManagerImpl._players.forEach { (_, manager) -> manager.save() }
+                    }
                 }
 
                 @EventHandler
-                fun onPlayerQuick(event: PlayerQuitEvent) {
+                fun onPlayerQuit(event: PlayerQuitEvent) {
                     val playerId = event.player.uniqueId
-                    this@GlobalStatManagerImpl._players.remove(playerId).let { player ->
-                        player?.save()
+                    synchronized(lock) {
+                        this@GlobalStatManagerImpl._players.remove(playerId)?.save()
                     }
                 }
             },
@@ -63,9 +66,10 @@ class GlobalStatManagerImpl(
     override fun register(stat: String) {
         require(stat.isNotBlank()) { "스탯 이름에 공백이 포함될 수 없습니다." }
         require(stat.all { it.isLowerCase() }) { "스탯 이름에 대문자가 포함될 수 없습니다." }
-        require(!this._stats.contains(stat)) { "이미 스탯 '$stat'이 존재합니다." }
-
-        this._stats.add(stat)
+        synchronized(lock) {
+            require(!_stats.contains(stat)) { "이미 스탯 '$stat'이 존재합니다." }
+            _stats.add(stat)
+        }
         this.event.register(stat)
     }
 
@@ -73,44 +77,50 @@ class GlobalStatManagerImpl(
         stat: String,
         event: Class<out StatEventListener>,
     ) {
-        this.register(stat)
+        register(stat)
         this.event.register(stat, event)
     }
 
     override fun register(event: Class<out StatEventListener>) {
         val stat = event.simpleName.removeSuffix("StatEvent").lowercase()
-        this.register(stat, event)
+        register(stat, event)
     }
 
     override fun unregister(stat: String) {
-        require(this._stats.contains(stat)) { "스탯 '$stat'이 존재하지 않습니다." }
-        this._stats.remove(stat)
-
-        this.config.unregister(stat)
-        this.event.unregister(stat)
-        this._players.forEach { (_, manager) -> manager.unregister(stat) }
+        synchronized(lock) {
+            require(_stats.contains(stat)) { "스탯 '$stat'이 존재하지 않습니다." }
+            _stats.remove(stat)
+        }
+        config.unregister(stat)
+        event.unregister(stat)
+        synchronized(lock) {
+            _players.forEach { (_, manager) -> manager.unregister(stat) }
+        }
     }
 
     override fun unregister(event: Class<out StatEventListener>) {
         val stat = event.simpleName.removeSuffix("StatEvent").lowercase()
-        this.unregister(stat)
+        unregister(stat)
     }
 
-    override fun create(playerId: UUID): StatManager =
-        this._players[playerId] ?: StatManagerImpl(this, playerId).also {
-            this._players[playerId] = it
+    override fun create(playerId: UUID): StatManager {
+        synchronized(lock) {
+            return _players[playerId] ?: StatManagerImpl(this, playerId).also {
+                _players[playerId] = it
+            }
         }
+    }
 
-    override fun create(player: Player): StatManager = this.create(player.uniqueId)
+    override fun create(player: Player): StatManager = create(player.uniqueId)
 
     override fun load() {
         val statFolders =
-            this.dataFolder
+            dataFolder
                 .walkTopDown()
-                .filter { it.isDirectory && it != this.dataFolder }
+                .filter { it.isDirectory && it != dataFolder }
         for (statFolder in statFolders) {
             val stat = statFolder.name.lowercase()
-            this.register(stat)
+            register(stat)
         }
     }
 }

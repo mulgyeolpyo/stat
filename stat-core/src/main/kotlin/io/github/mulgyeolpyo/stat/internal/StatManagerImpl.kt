@@ -12,43 +12,55 @@ class StatManagerImpl(
     private val manager: GlobalStatManagerImpl,
     private val playerId: UUID,
 ) : StatManager {
+    private val lock = Any()
+
     private val values = mutableMapOf<String, Float>()
     private val levels = mutableMapOf<String, Int>()
 
-    init {
-        this.load()
+    private fun requireValidStat(stat: String) {
+        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
     }
 
     override fun unregister(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        if (stat in this.values.keys) {
-            this.save(stat)
+        this.requireValidStat(stat)
+        synchronized(this.lock) {
+            this.values.remove(stat)
+            this.levels.remove(stat)
         }
-
-        this.values.remove(stat)
-        this.levels.remove(stat)
     }
 
     override fun get(stat: String): Float {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        return this.values[stat] ?: load(stat)
+        this.requireValidStat(stat)
+        synchronized(this.lock) {
+            this.values[stat]?.let { return it }
+        }
+        return this.load(stat)
     }
 
     override fun level(stat: String): Int {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        return this.levels[stat]
-            ?: this.manager.config
+        this.requireValidStat(stat)
+        synchronized(this.lock) {
+            this.levels[stat]?.let { return it }
+        }
+
+        val level =
+            this.manager.config
                 .get(stat)
                 .level(this.get(stat))
-                .also { level -> this.levels[stat] = level }
+        synchronized(this.lock) {
+            this.levels[stat] = level
+        }
+        return level
     }
 
     override fun set(
         stat: String,
         value: Float,
     ) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        this.values[stat] = value
+        this.requireValidStat(stat)
+        synchronized(this.lock) {
+            this.values[stat] = value
+        }
     }
 
     override fun set(
@@ -61,43 +73,47 @@ class StatManagerImpl(
         value: Float,
         operation: (BigDecimal, BigDecimal) -> BigDecimal,
     ): Float {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
-        val result = operation(this.get(stat).toBigDecimal(), value.toBigDecimal()).toFloat()
-        this.values[stat] = result
-        return result
+        this.requireValidStat(stat)
+        val value =
+            synchronized(this.lock) {
+                val result = operation(this.get(stat).toBigDecimal(), value.toBigDecimal()).toFloat()
+                this.values[stat] = result
+                result
+            }
+        return value
     }
 
     override fun increment(
         stat: String,
         value: Float,
-    ): Float = updateStat(stat, value, BigDecimal::add)
+    ): Float = this.updateStat(stat, value, BigDecimal::add)
 
     override fun increment(
         stat: String,
         value: Int,
-    ): Float = increment(stat, value.toFloat())
+    ): Float = this.increment(stat, value.toFloat())
 
     override fun decrement(
         stat: String,
         value: Float,
-    ): Float = updateStat(stat, value, BigDecimal::subtract)
+    ): Float = this.updateStat(stat, value, BigDecimal::subtract)
 
     override fun decrement(
         stat: String,
         value: Int,
-    ): Float = decrement(stat, value.toFloat())
+    ): Float = this.decrement(stat, value.toFloat())
 
     override fun load(stat: String): Float {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
+        this.requireValidStat(stat)
         val config = this.manager.config.get(stat)
         val value =
             Bukkit
-                .getPlayer(playerId)
+                .getPlayer(this.playerId)
                 ?.persistentData
                 ?.get(stat, PersistentDataType.FLOAT) ?: config.random
-        this.values[stat] = value
+        synchronized(this.lock) {
+            this.values[stat] = value
+        }
         return value
     }
 
@@ -108,16 +124,17 @@ class StatManagerImpl(
     }
 
     override fun save(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        val value = this.get(stat)
+        this.requireValidStat(stat)
+        val value = synchronized(this.lock) { this.get(stat) }
         Bukkit
-            .getPlayer(playerId)
+            .getPlayer(this.playerId)
             ?.persistentData
             ?.set(stat, PersistentDataType.FLOAT, value)
     }
 
     override fun save() {
-        for (stat in this.values.keys) {
+        val stats = this.values.keys.toList()
+        for (stat in stats) {
             this.save(stat)
         }
     }

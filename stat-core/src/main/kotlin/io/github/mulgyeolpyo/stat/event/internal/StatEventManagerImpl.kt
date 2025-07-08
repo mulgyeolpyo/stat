@@ -19,8 +19,12 @@ class StatEventManagerImpl(
     private val events = mutableMapOf<String, Class<out StatEventListener>>()
     private val listeners = mutableMapOf<String, StatEventListener>()
 
-    override fun register(stat: String) {
+    private fun requireValidStat(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+    }
+
+    override fun register(stat: String) {
+        this.requireValidStat(stat)
         this.load(stat)
     }
 
@@ -28,7 +32,7 @@ class StatEventManagerImpl(
         stat: String,
         event: Class<out StatEventListener>,
     ) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+        this.requireValidStat(stat)
 
         this.events[stat] = event
         this.enable(stat, event)
@@ -40,14 +44,14 @@ class StatEventManagerImpl(
     }
 
     override fun unregister(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        this.events.remove(stat)
+        this.requireValidStat(stat)
         this.disable(stat)
     }
 
     override fun enable(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        this.events[stat]?.let { this.enable(stat, it) }
+        this.requireValidStat(stat)
+        val event = this.events[stat] ?: return
+        this.enable(stat, event)
     }
 
     private fun enable(
@@ -63,7 +67,7 @@ class StatEventManagerImpl(
                 } catch (e: NoSuchMethodException) {
                     throw IllegalArgumentException("스탯 '$stat'에 대한 이벤트 리스너 생성을 실패했습니다.", e)
                 }
-
+            this.listeners[stat] = listener
             this.plugin.server.pluginManager
                 .registerEvents(listener, this.plugin)
         } catch (e: Exception) {
@@ -77,10 +81,9 @@ class StatEventManagerImpl(
     }
 
     override fun disable(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-        this.listeners.remove(stat)?.let { listener ->
-            this.disable(listener)
-        }
+        this.requireValidStat(stat)
+        val listener = this.listeners.remove(stat) ?: return
+        this.disable(listener)
     }
 
     private fun disable(listener: StatEventListener) {
@@ -88,46 +91,38 @@ class StatEventManagerImpl(
     }
 
     override fun load(stat: String): Class<out StatEventListener>? {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+        this.requireValidStat(stat)
 
-        val jarFile = dataFolder.resolve(stat).resolve("event.jar")
-        if (jarFile.exists()) {
-            URLClassLoader(arrayOf(jarFile.toURI().toURL()), javaClass.classLoader).use { classLoader ->
-                val event =
-                    JarFile(jarFile)
-                        .use { jar ->
-                            val eventListenerClassName = stat.replaceFirstChar { it.uppercaseChar() } + "EventListener"
-                            return@use jar
-                                .entries()
-                                .asSequence()
-                                .filter { !it.isDirectory && it.name.endsWith(".class") }
-                                .map { it.name.replace('/', '.').removeSuffix(".class") }
-                                .filter { className ->
-                                    className.endsWith(eventListenerClassName)
-                                }.mapNotNull { className ->
-                                    try {
-                                        val clazz = classLoader.loadClass(className)
-                                        if (StatEventListener::class.java.isAssignableFrom(clazz) &&
-                                            !Modifier.isAbstract(clazz.modifiers) &&
-                                            !clazz.isInterface
-                                        ) {
-                                            clazz.asSubclass(StatEventListener::class.java)
-                                        } else {
-                                            null
-                                        }
-                                    } catch (e: Throwable) {
-                                        null
-                                    }
-                                }
-                        }.first()
-
-                this.register(stat, event)
-                this.enable(stat, event)
-                return event
-            }
+        val jarFile = File(this.dataFolder, stat).resolve("event.jar")
+        if (!jarFile.exists()) {
+            return null
         }
 
-        return null
+        val eventListenerClassName = stat.replaceFirstChar { it.uppercaseChar() } + "EventListener"
+        URLClassLoader(arrayOf(jarFile.toURI().toURL()), this.javaClass.classLoader).use { classLoader ->
+            val event =
+                JarFile(jarFile).use { jar ->
+                    jar
+                        .entries()
+                        .asSequence()
+                        .filter { !it.isDirectory && it.name.endsWith(".class") }
+                        .map { it.name.replace('/', '.').removeSuffix(".class") }
+                        .find { className ->
+                            className.endsWith(eventListenerClassName) &&
+                                runCatching {
+                                    val clazz = classLoader.loadClass(className)
+                                    StatEventListener::class.java.isAssignableFrom(clazz) &&
+                                        !Modifier.isAbstract(clazz.modifiers) &&
+                                        !clazz.isInterface
+                                }.getOrDefault(false)
+                        }?.let { className ->
+                            classLoader.loadClass(className).asSubclass(StatEventListener::class.java)
+                        }
+                } ?: return null
+
+            this.register(stat, event)
+            return event
+        }
     }
 
     override fun load() {
