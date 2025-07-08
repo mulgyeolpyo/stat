@@ -4,6 +4,7 @@ import io.github.monun.tap.data.persistentData
 import io.github.mulgyeolpyo.stat.StatManager
 import org.bukkit.Bukkit
 import org.bukkit.persistence.PersistentDataType
+import java.math.BigDecimal
 import java.util.UUID
 
 @Suppress("unused")
@@ -55,35 +56,37 @@ class StatManagerImpl(
         value: Int,
     ) = this.set(stat, value.toFloat())
 
-    override fun increment(
+    private fun updateStat(
         stat: String,
         value: Float,
-    ) {
+        operation: (BigDecimal, BigDecimal) -> BigDecimal,
+    ): Float {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
 
-        val sum = (this.get(stat).toBigDecimal() + value.toBigDecimal()).toFloat()
-        this.values[stat] = sum
+        val result = operation(this.get(stat).toBigDecimal(), value.toBigDecimal()).toFloat()
+        this.values[stat] = result
+        return result
     }
 
     override fun increment(
         stat: String,
+        value: Float,
+    ): Float = updateStat(stat, value, BigDecimal::add)
+
+    override fun increment(
+        stat: String,
         value: Int,
-    ) = this.increment(stat, value.toFloat())
+    ): Float = increment(stat, value.toFloat())
 
     override fun decrement(
         stat: String,
         value: Float,
-    ) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
-
-        val diff = (this.get(stat).toBigDecimal() - value.toBigDecimal()).toFloat()
-        this.values[stat] = diff
-    }
+    ): Float = updateStat(stat, value, BigDecimal::subtract)
 
     override fun decrement(
         stat: String,
         value: Int,
-    ) = this.decrement(stat, value.toFloat())
+    ): Float = decrement(stat, value.toFloat())
 
     override fun load(stat: String): Float {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }

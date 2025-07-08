@@ -73,7 +73,7 @@ interface StatManager {
     fun increment(
         stat: String,
         value: Float,
-    )
+    ): Float
 
     /**
      * Increases the value of a specific stat for the managed player by an integer amount.
@@ -86,7 +86,7 @@ interface StatManager {
     fun increment(
         stat: String,
         value: Int,
-    )
+    ): Float
 
     /**
      * Decreases the value of a specific stat for the managed player by a float amount.
@@ -99,7 +99,7 @@ interface StatManager {
     fun decrement(
         stat: String,
         value: Float,
-    )
+    ): Float
 
     /**
      * Decreases the value of a specific stat for the managed player by an integer amount.
@@ -112,7 +112,7 @@ interface StatManager {
     fun decrement(
         stat: String,
         value: Int,
-    )
+    ): Float
 
     /**
      * Loads the value of a specific stat for the managed player from persistent storage into memory.
