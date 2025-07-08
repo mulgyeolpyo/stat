@@ -14,8 +14,8 @@ class StatManagerImpl(
 ) : StatManager {
     private val lock = Any()
 
-    private val values = mutableMapOf<String, Float>()
-    private val levels = mutableMapOf<String, Int>()
+    private val values: MutableMap<String, Float> = mutableMapOf()
+    private val levels: MutableMap<String, Int> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }

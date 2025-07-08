@@ -11,7 +11,7 @@ class StatConfigManagerImpl(
     private val manager: GlobalStatManager,
     private val dataFolder: File,
 ) : StatConfigManager {
-    private val configs = mutableMapOf<String, StatConfig>()
+    private val configs: MutableMap<String, StatConfig> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }

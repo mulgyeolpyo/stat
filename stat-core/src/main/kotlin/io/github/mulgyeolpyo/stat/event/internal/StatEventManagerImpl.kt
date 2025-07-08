@@ -16,8 +16,8 @@ class StatEventManagerImpl(
     private val plugin: JavaPlugin,
     private val dataFolder: File,
 ) : StatEventManager {
-    private val events = mutableMapOf<String, Class<out StatEventListener>>()
-    private val listeners = mutableMapOf<String, StatEventListener>()
+    private val events: MutableMap<String, Class<out StatEventListener>> = mutableMapOf()
+    private val listeners: MutableMap<String, StatEventListener> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
         require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }

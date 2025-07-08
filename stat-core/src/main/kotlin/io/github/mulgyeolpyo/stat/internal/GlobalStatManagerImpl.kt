@@ -21,16 +21,16 @@ class GlobalStatManagerImpl(
     dataFolder: File,
 ) : GlobalStatManager {
     private val lock = Any()
-    override val dataFolder: File = dataFolder
-        get() =
-            File(field, "stat").apply {
-                if (!exists()) {
-                    mkdirs()
-                }
-            }
+    override val dataFolder = File(dataFolder, "stat")
 
-    override val config: StatConfigManager = StatConfigManager.create(this, dataFolder)
-    override val event: StatEventManager = StatEventManager.create(this, this.plugin, dataFolder)
+    init {
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs()
+        }
+    }
+
+    override val config = StatConfigManager.create(this, dataFolder)
+    override val event = StatEventManager.create(this, this.plugin, dataFolder)
 
     private val _stats: MutableList<String> = mutableListOf()
     private val _players: MutableMap<UUID, StatManager> = mutableMapOf()
