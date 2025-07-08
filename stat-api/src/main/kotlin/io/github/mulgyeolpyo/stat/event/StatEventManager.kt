@@ -126,27 +126,4 @@ interface StatEventManagerInternal {
         manager: GlobalStatManager,
         plugin: JavaPlugin,
     ): StatEventManager
-
-    /**
-     * Creates a new instance of [StatEventManager] with a specific data folder, using a default plugin.
-     * The plugin context will be automatically determined (e.g., via `JavaPlugin.getProvidingPlugin`).
-     *
-     * @param manager The [GlobalStatManager] instance to associate with this event manager.
-     * @param dataFolder The base directory where event-related files (like JARs) will be stored.
-     * @return A new [StatEventManager] instance.
-     */
-    fun create(
-        manager: GlobalStatManager,
-        dataFolder: File,
-    ): StatEventManager
-
-    /**
-     * Creates a new instance of [StatEventManager] using the default plugin and data folder.
-     * The plugin context and data folder will be determined automatically (e.g., `JavaPlugin.getProvidingPlugin`
-     * and `GlobalStatManager.dataFolder`).
-     *
-     * @param manager The [GlobalStatManager] instance, which also provides the default data folder.
-     * @return A new [StatEventManager] instance.
-     */
-    fun create(manager: GlobalStatManager): StatEventManager
 }
