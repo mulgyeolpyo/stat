@@ -75,3 +75,9 @@ projectPlugin.tasks.named("clipJar") {
     dependsOn(tasks.named("publishApiPublicationToServerRepository"))
     dependsOn(tasks.named("publishCorePublicationToServerRepository"))
 }
+
+tasks.register("publishMaven")
+tasks.named("publishMaven") {
+    dependsOn(tasks.named("publishApiPublicationToMavenCentralRepository"))
+    dependsOn(tasks.named("publishCorePublicationToMavenCentralRepository"))
+}
