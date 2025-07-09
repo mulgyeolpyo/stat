@@ -24,8 +24,8 @@ class GlobalStatManagerImpl(
     override val dataFolder = File(dataFolder, "stat")
 
     init {
-        if (!dataFolder.exists()) {
-            dataFolder.mkdirs()
+        if (!this.dataFolder.exists()) {
+            this.dataFolder.mkdirs()
         }
     }
 
