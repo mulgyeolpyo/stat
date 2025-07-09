@@ -3,6 +3,7 @@ package io.github.mulgyeolpyo.stat.event.internal
 import io.github.mulgyeolpyo.stat.GlobalStatManager
 import io.github.mulgyeolpyo.stat.event.StatEventListener
 import io.github.mulgyeolpyo.stat.event.StatEventManager
+import org.bukkit.Bukkit
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -20,7 +21,7 @@ class StatEventManagerImpl(
     private val listeners: MutableMap<String, StatEventListener> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+        require(stat in this.manager.stats) { "Stat '$stat' does not exist." }
     }
 
     override fun register(stat: String) {
@@ -33,9 +34,9 @@ class StatEventManagerImpl(
         event: Class<out StatEventListener>,
     ) {
         this.requireValidStat(stat)
-
         this.events[stat] = event
         this.enable(stat, event)
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Event manager for stat '$stat' has been registered." }
     }
 
     override fun register(event: Class<out StatEventListener>) {
@@ -46,12 +47,14 @@ class StatEventManagerImpl(
     override fun unregister(stat: String) {
         this.requireValidStat(stat)
         this.disable(stat)
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Event manager for stat '$stat' has been unregistered." }
     }
 
     override fun enable(stat: String) {
         this.requireValidStat(stat)
         val event = this.events[stat] ?: return
         this.enable(stat, event)
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Event for stat '$stat' has been enabled." }
     }
 
     private fun enable(
@@ -65,13 +68,13 @@ class StatEventManagerImpl(
                         .getDeclaredConstructor(GlobalStatManager::class.java)
                         .newInstance(this.manager)
                 } catch (e: NoSuchMethodException) {
-                    throw IllegalArgumentException("스탯 '$stat'에 대한 이벤트 리스너 생성을 실패했습니다.", e)
+                    throw IllegalArgumentException("Failed to create event listener for stat '$stat'.", e)
                 }
             this.listeners[stat] = listener
             this.plugin.server.pluginManager
                 .registerEvents(listener, this.plugin)
         } catch (e: Exception) {
-            throw IllegalArgumentException("스탯 '$stat'에 대한 이벤트 리스너 생성을 실패했습니다.", e)
+            throw IllegalArgumentException("Failed to create event listener for stat '$stat'.", e)
         }
     }
 
@@ -84,6 +87,7 @@ class StatEventManagerImpl(
         this.requireValidStat(stat)
         val listener = this.listeners.remove(stat) ?: return
         this.disable(listener)
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Event for stat '$stat' has been disabled." }
     }
 
     private fun disable(listener: StatEventListener) {
