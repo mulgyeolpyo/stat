@@ -1,7 +1,7 @@
 package io.github.mulgyeolpyo.stat.config
 
 import io.github.monun.tap.config.Config
-import kotlin.math.pow
+import io.github.mulgyeolpyo.stat.utili.pow
 import kotlin.random.Random
 
 /**
@@ -36,7 +36,7 @@ open class StatConfig {
      * The default value assigned to the stat upon creation.
      */
     @Config
-    var default: Float = 0f
+    var default: Int = 0
         set(value) {
             field = value
             this.levels = this.calculateLevels()
@@ -48,8 +48,8 @@ open class StatConfig {
      * `default ± (this.random * multiplier)`.
      */
     @Config
-    var random: Float = 0f
-        get() = default + (Random.nextFloat() * 2 * field - field) * Random.nextFloat()
+    var random: Int = 0
+        get() = default + ((Random.nextFloat() * 2 * field - field) * Random.nextFloat()).toInt()
 
     /**
      * The growth factor that determines the required value for each level.
@@ -57,7 +57,7 @@ open class StatConfig {
      * making it harder to level up.
      */
     @Config
-    var weight: Float = 2f
+    var weight: Int = 2
         set(value) {
             field = value
             this.levels = this.calculateLevels()
@@ -67,10 +67,10 @@ open class StatConfig {
      * A pre-calculated list of value thresholds required for each level.
      * The index of the list corresponds to the level.
      */
-    var levels: List<Float> = calculateLevels()
+    var levels: List<Int> = calculateLevels()
 
-    private fun calculateLevels(): List<Float> {
-        val levels = mutableListOf<Float>()
+    private fun calculateLevels(): List<Int> {
+        val levels = mutableListOf<Int>()
 
         var level = 10
         var next = this.weight
@@ -95,7 +95,7 @@ open class StatConfig {
      * @param value The stat value to check.
      * @return The calculated level, ranging from 0 to `max`.
      */
-    fun level(value: Float): Int {
+    fun level(value: Long): Int {
         if (value < this.levels.first()) return 0
         if (value >= this.levels.last()) return this.max
 
@@ -104,7 +104,6 @@ open class StatConfig {
                 return level
             }
         }
-
         return this.max
     }
 }

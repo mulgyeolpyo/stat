@@ -4,8 +4,8 @@ import io.github.monun.tap.data.persistentData
 import io.github.mulgyeolpyo.stat.StatManager
 import org.bukkit.Bukkit
 import org.bukkit.persistence.PersistentDataType
-import java.math.BigDecimal
 import java.util.UUID
+import kotlin.synchronized
 
 @Suppress("unused")
 class StatManagerImpl(
@@ -14,7 +14,7 @@ class StatManagerImpl(
 ) : StatManager {
     private val lock = Any()
 
-    private val values: MutableMap<String, Float> = mutableMapOf()
+    private val exps: MutableMap<String, Long> = mutableMapOf()
     private val levels: MutableMap<String, Int> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
@@ -24,15 +24,15 @@ class StatManagerImpl(
     override fun unregister(stat: String) {
         this.requireValidStat(stat)
         synchronized(this.lock) {
-            this.values.remove(stat)
+            this.exps.remove(stat)
             this.levels.remove(stat)
         }
     }
 
-    override fun get(stat: String): Float {
+    override fun get(stat: String): Long {
         this.requireValidStat(stat)
         synchronized(this.lock) {
-            this.values[stat]?.let { return it }
+            this.exps[stat]?.let { return it }
         }
         return this.load(stat)
     }
@@ -55,64 +55,67 @@ class StatManagerImpl(
 
     override fun set(
         stat: String,
-        value: Float,
+        value: Long,
     ) {
         this.requireValidStat(stat)
         synchronized(this.lock) {
-            this.values[stat] = value
+            this.exps[stat] = value
         }
     }
 
     override fun set(
         stat: String,
         value: Int,
-    ) = this.set(stat, value.toFloat())
+    ) = this.set(stat, value.toLong())
 
-    private fun updateStat(
+    override fun increment(
         stat: String,
-        value: Float,
-        operation: (BigDecimal, BigDecimal) -> BigDecimal,
-    ): Float {
+        value: Long,
+    ): Long {
         this.requireValidStat(stat)
         val value =
             synchronized(this.lock) {
-                val result = operation(this.get(stat).toBigDecimal(), value.toBigDecimal()).toFloat()
-                this.values[stat] = result
-                result
+                val value = this.get(stat) + value
+                this.exps[stat] = value
+                value
             }
         return value
     }
 
     override fun increment(
         stat: String,
-        value: Float,
-    ): Float = this.updateStat(stat, value, BigDecimal::add)
-
-    override fun increment(
-        stat: String,
         value: Int,
-    ): Float = this.increment(stat, value.toFloat())
+    ): Long = this.increment(stat, value.toLong())
 
     override fun decrement(
         stat: String,
-        value: Float,
-    ): Float = this.updateStat(stat, value, BigDecimal::subtract)
+        value: Long,
+    ): Long {
+        this.requireValidStat(stat)
+        val value =
+            synchronized(this.lock) {
+                val value = this.get(stat) - value
+                this.exps[stat] = value
+                value
+            }
+        return value
+    }
 
     override fun decrement(
         stat: String,
         value: Int,
-    ): Float = this.decrement(stat, value.toFloat())
+    ): Long = this.decrement(stat, value.toLong())
 
-    override fun load(stat: String): Float {
+    override fun load(stat: String): Long {
         this.requireValidStat(stat)
         val config = this.manager.config.get(stat)
         val value =
             Bukkit
                 .getPlayer(this.playerId)
                 ?.persistentData
-                ?.get(stat, PersistentDataType.FLOAT) ?: config.random
+                ?.get(stat, PersistentDataType.LONG) ?: config.random.toLong()
         synchronized(this.lock) {
-            this.values[stat] = value
+            this.exps[stat] = value
         }
         return value
     }
@@ -129,13 +132,13 @@ class StatManagerImpl(
         Bukkit
             .getPlayer(this.playerId)
             ?.persistentData
-            ?.set(stat, PersistentDataType.FLOAT, value)
+            ?.set(stat, PersistentDataType.LONG, value)
     }
 
     override fun save() {
-        val stats = this.values.keys.toList()
-        for (stat in stats) {
-            this.save(stat)
+        val exps = this.exps.keys.toList()
+        for (exp in exps) {
+            this.save(exp)
         }
     }
 }

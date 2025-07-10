@@ -61,45 +61,49 @@ open class StatEventListener(
     ) {
         /**
          * Retrieves the current value of the stat associated with the outer [StatEventListener].
-         * @return The current float value of the stat.
+         * @return The current Long value of the stat.
          */
-        fun get(): Float = manager.get(this@StatEventListener.stat)
+        fun get(): Long = manager.get(this@StatEventListener.stat)
 
         /**
          * Sets the value of the stat associated with the outer [StatEventListener].
-         * @param value The new float value to set.
+         * @param value The new Long value to set.
          */
-        fun set(value: Float) = manager.set(this@StatEventListener.stat, value)
+        fun set(value: Long) = manager.set(this@StatEventListener.stat, value)
 
         /**
          * Sets the value of the stat associated with the outer [StatEventListener].
-         * @param value The new integer value to set.
+         * @param value The new integer value to set (converted to Long).
          */
         fun set(value: Int) = manager.set(this@StatEventListener.stat, value)
 
         /**
-         * Increments the value of the stat associated with the outer [StatEventListener] by a float amount.
-         * @param value The float amount to increment by.
+         * Increments the value of the stat associated with the outer [StatEventListener] by a Long amount.
+         * @param value The Long amount to increment by.
+         * @return The updated Long value after increment.
          */
-        fun increment(value: Float) = manager.increment(this@StatEventListener.stat, value)
+        fun increment(value: Long): Long = manager.increment(this@StatEventListener.stat, value)
 
         /**
          * Increments the value of the stat associated with the outer [StatEventListener] by an integer amount.
-         * @param value The integer amount to increment by.
+         * @param value The integer amount to increment by (converted to Long).
+         * @return The updated Long value after increment.
          */
-        fun increment(value: Int) = manager.increment(this@StatEventListener.stat, value)
+        fun increment(value: Int): Long = manager.increment(this@StatEventListener.stat, value)
 
         /**
-         * Decrements the value of the stat associated with the outer [StatEventListener] by a float amount.
-         * @param value The float amount to decrement by.
+         * Decrements the value of the stat associated with the outer [StatEventListener] by a Long amount.
+         * @param value The Long amount to decrement by.
+         * @return The updated Long value after decrement.
          */
-        fun decrement(value: Float) = manager.decrement(this@StatEventListener.stat, value)
+        fun decrement(value: Long): Long = manager.decrement(this@StatEventListener.stat, value)
 
         /**
          * Decrements the value of the stat associated with the outer [StatEventListener] by an integer amount.
-         * @param value The integer amount to decrement by.
+         * @param value The integer amount to decrement by (converted to Long).
+         * @return The updated Long value after decrement.
          */
-        fun decrement(value: Int) = manager.decrement(this@StatEventListener.stat, value)
+        fun decrement(value: Int): Long = manager.decrement(this@StatEventListener.stat, value)
 
         /**
          * Saves the current value of the stat associated with the outer [StatEventListener] to persistent storage.
