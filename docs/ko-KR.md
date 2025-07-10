@@ -28,7 +28,7 @@ Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sa
 기본 플러그인 데이터의 저장 경로는 '{사용한 플러그인의 이름}/stat/~'입니다.<br>
 
 기본적으로 `GlobalStatManager.create`을 이용한 인스턴스 생성이 대표적이지만,<br>
-`GlobalStatManager.load`를 이용한 인스턴스 생성으로, 데이터 폴더에 놓은 `Event.jar`의 이벤트를 자동 등록 할 수 있습니다. <br><br>
+`GlobalStatManager.load`를 이용한 인스턴스 생성으로, 데이터 폴더에 놓은 `event.jar`의 이벤트를 자동 등록 할 수 있습니다. <br><br>
 
 <span style="color: #A8AEB7">_추후, 해당 방식을 이용한 프로젝트가 추가될 예정입니다._</span>
 

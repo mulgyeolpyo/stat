@@ -29,7 +29,7 @@ Of course. Here is the English translation of the provided text, formatted and s
 The default data storage path is `/{PluginDataFolder}/stat/~`.<br>
 
 Although creating an instance with `GlobalStatManager.create` is the standard method,<br>
-you can also use `GlobalStatManager.load` to automatically register events from `Event.jar` files placed within the data folder.
+you can also use `GlobalStatManager.load` to automatically register events from `event.jar` files placed within the data folder.
 
 <span style="color: #A8AEB7">_A sample project demonstrating this approach will be added in the future._</span>
 
