@@ -87,7 +87,7 @@ class StatEventManagerImpl(
     }
 
     private fun enable(event: Class<out StatEventListener>) {
-        val stat = event.simpleName.removeSuffix("StatEvent").lowercase()
+        val stat = event.simpleName.removeSuffix("StatEventListener").lowercase()
         this.enable(stat, event)
     }
 
@@ -110,7 +110,7 @@ class StatEventManagerImpl(
             return null
         }
 
-        val eventListenerClassName = stat.replaceFirstChar { it.uppercaseChar() } + "EventListener"
+        val eventListenerClassName = stat.replaceFirstChar { it.uppercaseChar() } + "StatEventListener"
         URLClassLoader(arrayOf(jarFile.toURI().toURL()), this.javaClass.classLoader).use { classLoader ->
             val event =
                 JarFile(jarFile).use { jar ->

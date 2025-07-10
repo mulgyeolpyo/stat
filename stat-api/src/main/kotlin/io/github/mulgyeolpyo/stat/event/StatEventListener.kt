@@ -29,7 +29,7 @@ open class StatEventListener(
 ) : Listener {
     private val stat: String =
         stat ?: this@StatEventListener::class.java.simpleName
-            .removeSuffix("StatEvent")
+            .removeSuffix("StatEventListener")
             .lowercase()
 
     /**
