@@ -63,29 +63,30 @@ class GlobalStatManagerImpl(
         )
     }
 
-    override fun register(stat: String) {
-        require(stat.isNotBlank()) { "Stat name cannot be blank." }
-        require(stat.all { it.isLowerCase() }) { "Stat name cannot contain uppercase letters." }
-        synchronized(lock) {
-            require(!_stats.contains(stat)) { "Stat '$stat' already exists." }
-            _stats.add(stat)
+    private fun requireValidStat(stat: String) {
+        require(stat.isNotBlank()) { "[Mulgyeolpyo.Stat] StatError: name for '$stat' must not be blank." }
+        require(
+            stat.all { it.isLowerCase() },
+        ) { "[Mulgyeolpyo.Stat] StatError: Stat name for '$stat' must not be written with uppercase letters." }
+        synchronized(this.lock) {
+            require(stat !in this._stats) { "[Mulgyeolpyo.Stat] StatError: name '$stat' is already registered." }
+            this._stats.add(stat)
         }
+    }
+
+    override fun register(stat: String) {
+        this.requireValidStat(stat)
         this.event.register(stat)
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat '$stat' has been registered." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully registered '$stat'." }
     }
 
     override fun register(
         stat: String,
         event: Class<out StatEventListener>,
     ) {
-        require(stat.isNotBlank()) { "Stat name cannot be blank." }
-        require(stat.all { it.isLowerCase() }) { "Stat name cannot contain uppercase letters." }
-        synchronized(lock) {
-            require(!_stats.contains(stat)) { "Stat '$stat' already exists." }
-            _stats.add(stat)
-        }
+        this.requireValidStat(stat)
         this.event.register(stat, event)
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat '$stat' has been registered." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully registered '$stat'." }
     }
 
     override fun register(event: Class<out StatEventListener>) {
@@ -95,15 +96,14 @@ class GlobalStatManagerImpl(
 
     override fun unregister(stat: String) {
         synchronized(this.lock) {
-            require(this._stats.contains(stat)) { "Stat '$stat' does not exist." }
-            this._stats.remove(stat)
+            require(this._stats.remove(stat)) { "[Mulgyeolpyo.Stat] StatError: name '$stat' is not registered." }
         }
         this.config.unregister(stat)
         this.event.unregister(stat)
         synchronized(this.lock) {
             this._players.forEach { (_, manager) -> manager.unregister(stat) }
         }
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat '$stat' has been unregistered." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully unregistered '$stat'." }
     }
 
     override fun unregister(event: Class<out StatEventListener>) {

@@ -18,7 +18,7 @@ class StatManagerImpl(
     private val levels: MutableMap<String, Int> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
-        require(stat in this.manager.stats) { "스탯 '$stat'이 존재하지 않습니다." }
+        require(stat in this.manager.stats) { "StatError: name '$stat' is not registered." }
     }
 
     override fun unregister(stat: String) {

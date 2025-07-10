@@ -15,14 +15,14 @@ class StatConfigManagerImpl(
     private val configs: MutableMap<String, StatConfig> = mutableMapOf()
 
     private fun requireValidStat(stat: String) {
-        require(stat in this.manager.stats) { "Stat '$stat' does not exist." }
+        require(stat in this.manager.stats) { "[Mulgyeolpyo.Stat] StatError: name '$stat' is not registered." }
     }
 
     override fun unregister(stat: String) {
         this.requireValidStat(stat)
         val config = this.configs.remove(stat) ?: return
         this.save(stat, config)
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat config manager for '$stat' has been unregistered." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully unregistered StatConfigManager for '$stat'." }
     }
 
     override fun get(stat: String): StatConfig {
@@ -46,7 +46,7 @@ class StatConfigManagerImpl(
             config.default = config.default
         }
         this.configs[stat] = config
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat '$stat' config has been loaded." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully loaded StatConfig for '$stat' in StatConfigManager." }
         return config
     }
 
@@ -62,7 +62,7 @@ class StatConfigManagerImpl(
     ) {
         val file = File(this.dataFolder, "$stat.yml").apply { delete() }
         ConfigSupport.compute(config, file, separateByClass = true)
-        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Stat '$stat' config has been saved." }
+        Bukkit.getLogger().info { "[Mulgyeolpyo.Stat] Successfully saved StatConfig for '$stat' in '${file.path}'." }
     }
 
     override fun save(stat: String) {
