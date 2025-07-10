@@ -42,7 +42,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation 'io.github.mulgyeolpyo:stat-api:'
+    implementation 'io.github.mulgyeolpyo:stat-api:<version>'
 }
 ```
 
