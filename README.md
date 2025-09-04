@@ -1,4 +1,4 @@
-# Mulgyeolpyo Studio, Stat Module (only PaperMC v1.20.1)
+# 물결표 스튜디오, 스탯 모듈 (only PaperMC v1.20.1)
 
 [![Java](https://img.shields.io/badge/java-17-ED8B00.svg?logo=java)](https://www.azul.com/)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-585DEF.svg?logo=kotlin)](http://kotlinlang.org)
@@ -10,28 +10,27 @@
 
 Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sample-complex)**
 
-[**<u>English</u>**](README.md)　|　[**<u>한국어</u>**](docs/ko-KR.md)<br>
-<span style="color: #A8AEB7">_Note: The 🌏English translation is machine-generated and may contain errors._</span>
+[**<u>English</u>**](../README.md)　|　[**<u>한국어</u>**](README.md)<br>
+<span style="color: #A8AEB7">_(모든 🌏영문 번역은 AI로 진행되어 부정확한 부분이 존재할 수 있습니다)_</span>
 
 <hr>
 
-**For content, for servers,**<br>
-This is a PaperMC library that helps seamlessly manage stats, a commonly used RPG element.
-Of course. Here is the English translation of the provided text, formatted and styled to fit seamlessly into your README file.
+**컨텐츠를 위한, 서버를 위한,**<br>
+흔히 사용되는 RPG 요소인 스탯 관리를 원활히 도와주는 PaperMC 관련 라이브러리입니다.
 
 ## Feature
-- **GlobalStatManager**: The central hub for managing all stat-related data. <br>
-  <span style="color: #A8AEB7">_(It is recommended to declare and use a single instance for management.)_</span>
-- **StatEventListener**: An event listener containing helper functions to simplify access to individual stats.
+- **GlobalStatManager**: 모든 스탯 관련 데이터를 관리하는 집합체입니다.<br>
+    <span style="color: #A8AEB7">_(단, 하나만 선언하여 관리하는 것이 추천됩니다)_</span>
+- **StatEventListener**: 단일 스탯 접근을 간편하게 도와주는 함수가 내장되어 있는 이벤트 리스너입니다.
 
-<span style="color: #967BDC">_While many other features are implemented, they are omitted here as you will rarely need to interact with their classes directly._</span>
+<span style="color: #967BDC">_이 외에도 다양한 관련 기능이 구현되어 있지만, 직접 클래스를 선언하는 경우는 드물어 제외했습니다._</span>
 
-The default data storage path is `/{PluginDataFolder}/stat/~`.<br>
+기본 플러그인 데이터의 저장 경로는 '{사용한 플러그인의 이름}/stat/~'입니다.<br>
 
-Although creating an instance with `GlobalStatManager.create` is the standard method,<br>
-you can also use `GlobalStatManager.load` to automatically register events from `event.jar` files placed within the data folder.
+기본적으로 `GlobalStatManager.create`을 이용한 인스턴스 생성이 대표적이지만,<br>
+`GlobalStatManager.load`를 이용한 인스턴스 생성으로, 데이터 폴더에 놓은 `event.jar`의 이벤트를 자동 등록 할 수 있습니다. <br><br>
 
-<span style="color: #A8AEB7">_A sample project demonstrating this approach will be added in the future._</span>
+<span style="color: #A8AEB7">_추후, 해당 방식을 이용한 프로젝트가 추가될 예정입니다._</span>
 
 <hr>
 
@@ -64,7 +63,7 @@ dependencies {
 ```
 
 ### WARNING ⚠
-<span style="color: #ED5466">When using this module, you must add the following to your `plugin.yml`.</span>
+<span style="color: #ED5466">해당 모듈을 사용할 경우, `plugin.yml`에 반드시 다음을 추가해야 합니다.</span>
 ```yaml
 libraries:
   - io.github.mulgyeolpyo:stat-api:<version>
@@ -75,20 +74,20 @@ libraries:
 ## Example
 ### 1. Create a Manager For Stats
 ```kotlin
-val globalStatManager = GlobalStatManager.create(plugin = this) // The plugin instance must be passed to `this`.
+val globalStatManager = GlobalStatManager.create(plugin = this) // this에 플러그인 인스턴스가 들어가야 합니다.
 // or 
-val globalStatManager = GlobalStatManager.create() // In this case, it automatically finds the plugin instance.
+val globalStatManager = GlobalStatManager.create() // 이 경우, 자동으로 플러그인 인스턴스를 찾습니다.
 ```
 
-### 2. Add a Stat
+### 2. Add Stat
 ```kotlin
-/* Choose one of the methods below. */
+/* 아래 방식 중 하나를 선택하시면 됩니다. */
 val stat = globalStatManager.register(stat = statName)
 /* 
-    For the `event` parameter, create a class that references StatEventListener.
-    (StatEventListener is used for convenient stat access)
+    event 매개변수의 경우, StatEventListener를 참조하는 클래스를 생성하시면 됩니다.  
+    (StatEventListener를 사용하는 이유는 간편한 스탯 접근을 위함입니다)
     
-    Ex) stat(player).increment(1) // Refer to the StatEventListener.kt file in the 'stat-plugin' folder.
+    Ex) stat(player).increment(1) // 'stat-plugin' 폴더의 StatEventListener.kt 파일을 참고하세요.
 */
 val stat = globalStatManager.register(stat = statName, event = StatEventListener::class.java)
 val stat = globalStatManager.register(event = StatEventListener::class.java)
@@ -97,22 +96,22 @@ val stat = globalStatManager.register(event = StatEventListener::class.java)
 ### 3. Access a Stat
 ```kotlin
 /*
-    For intuitive and easy stat access, you can use StatEventListener.
-    However, if you want to access stats directly, use the method below.
+    직관적이고 간편한 스탯 접근은 StatEventListener를 사용하시면 되지만,
+    직접적으로 스탯을 접근하고 싶다면 아래와 같이 사용하시면 됩니다.
  */
 val playerStats = globalStatManager.create(player = player)
-val strengthStat = playerStats.getStat(stat = "strength") // Gets the stat named "strength".
+val strengthStat = playerStats.getStat(stat = "strength") // "strength"라는 이름의 스탯을 가져옵니다.
 
-// StatEventListener includes code that simplifies this process.
+// 이 작업을 간편히 하는 코드가 포함된 것이, StatEventListener입니다.
 ```
 
 ### 4. Access Stat Configuration
 ```kotlin
 /*
-    Stat configuration can be accessed through the GlobalStatManager.
+    스탯 설정은 GlobalStatManager를 통한 접근이 가능합니다.
  */
-val statConfig = globalStatManager.getStatConfig(stat = "strength") // Gets the configuration for the stat named "strength".
+val statConfig = globalStatManager.getStatConfig(stat = "strength") // "strength"라는 이름의 스탯 설정을 가져옵니다.
 
-// The feature to modify the stat elements themselves is not yet implemented.
-// For intuitive modification of stat settings, check the default configuration path at '/{pluginDataFolder}/stat/~'.
+// 아직 스탯의 요소 자체를 변경하는 기능은 미구현되어 있습니다.
+// 직관적인 스탯 설정 수정을 원하신다면, 기본 설정값인 '/{pluginDataFolder}/stat/~'를 확인해보세요/
 ```

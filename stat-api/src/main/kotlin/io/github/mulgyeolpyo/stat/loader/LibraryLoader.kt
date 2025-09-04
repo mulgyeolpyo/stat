@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2022 Monun
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.mulgyeolpyo.stat.loader
 
 import org.bukkit.Bukkit
@@ -32,7 +15,7 @@ internal object LibraryLoader {
         return try {
             val clazz = Class.forName(className, true, type.classLoader).asSubclass(type)
             val constructor = clazz.getConstructor(*parameterTypes)
-            constructor.newInstance(*initArgs) as T
+            constructor.newInstance(*initArgs)
         } catch (e: ClassNotFoundException) {
             throw UnsupportedOperationException("${type.name} does not have implement", e)
         } catch (e: IllegalAccessException) {
@@ -49,8 +32,8 @@ internal object LibraryLoader {
         vararg initArgs: Any?,
     ): T {
         val packageName = type.`package`.name
-        val className = "${type.simpleName}Impl"
-        return loadClass("$packageName.internal.$className", type, *initArgs)
+        val className = "$packageName.internal.${type.simpleName}Impl"
+        return loadClass(className, type, *initArgs)
     }
 
     fun <T> loadNMS(
@@ -59,17 +42,17 @@ internal object LibraryLoader {
     ): T {
         val packageName = type.`package`.name
         val className = "NMS${type.simpleName}"
+
         val candidates =
             listOf(
                 "$packageName.$libraryVersion.$className",
-                "${
-                    packageName.substringBeforeLast('.', "") + ".$libraryVersion." +
-                        packageName.substringAfterLast('.')
-                }.$className",
+                "${packageName.substringBeforeLast('.', "")}.$libraryVersion.${packageName.substringAfterLast('.') }.$className",
             )
 
-        candidates.forEach { candidate ->
-            runCatching { return loadClass(candidate, type, *initArgs) }
+        for (candidate in candidates) {
+            runCatching {
+                return loadClass(candidate, type, *initArgs)
+            }
         }
 
         throw UnsupportedOperationException("${type.name} does not support this version: $libraryVersion")

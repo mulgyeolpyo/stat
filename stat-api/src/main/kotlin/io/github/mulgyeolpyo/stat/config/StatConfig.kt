@@ -1,109 +1,147 @@
 package io.github.mulgyeolpyo.stat.config
 
 import io.github.monun.tap.config.Config
+import io.github.monun.tap.config.RangeInt
+import io.github.monun.tap.config.RangeLong
+import io.github.mulgyeolpyo.stat.utili.add
 import io.github.mulgyeolpyo.stat.utili.pow
-import kotlin.random.Random
+import io.github.mulgyeolpyo.stat.utili.subtract
+import kotlin.math.max
+import kotlin.math.min
 
-/**
- * Represents the configuration for a specific stat, such as its level range,
- * growth rate, and initial values.
- */
 @Suppress("unused")
 open class StatConfig {
-    /**
-     * The minimum possible level for the stat.
-     * This defines the lower bound of the level range.
-     */
+    val name: String
+
     @Config
-    var min: Int = 0
-        set(value) {
-            field = value
-            this.levels = this.calculateLevels()
+    val description: String = ""
+
+    init {
+        val statName = this::class.java.getAnnotation(StatName::class.java)
+
+        require(statName != null) {
+            "[Mulgyeolpyo.Stat] 스탯 설정 클래스에는 @StatName 어노테이션이 없어선 안됩니다."
         }
 
-    /**
-     * The maximum possible level for the stat.
-     * This defines the upper bound of the level range.
-     */
+        this.name = statName.name
+    }
+
     @Config
-    var max: Int = 100
+    @RangeLong(min = 0L)
+    var default: Long = 0L
         set(value) {
+            val maxRandomPositiveEstimate = value.add(this.random)
+            val maxRandomNegativeEstimate = value.subtract(this.random)
+
+            val isPositive = value >= 0
+            val isPositiveStable = this.max <= maxRandomPositiveEstimate
+            val isNegativeStable = maxRandomNegativeEstimate >= 0
+
+            require(isPositive || isPositiveStable || isNegativeStable) {
+                "[Mulgyeolpyo.Stat] 스탯 기본값이 올바르지 않습니다."
+            }
+
             field = value
-            this.levels = this.calculateLevels()
         }
 
-    /**
-     * The default value assigned to the stat upon creation.
-     */
     @Config
-    var default: Int = 0
+    @RangeLong(min = 0L)
+    var random: Long = 0L
         set(value) {
+            val maxRandomPositiveEstimate = this.default.add(value)
+            val maxRandomNegativeEstimate = this.default.subtract(value)
+
+            val isPositive = value >= 0
+            val isPositiveStable = this.max <= maxRandomPositiveEstimate
+            val isNegativeStable = maxRandomNegativeEstimate >= 0
+
+            require(isPositive || isPositiveStable || isNegativeStable) {
+                "[Mulgyeolpyo.Stat] 스탯 기본값의 범위가 올바르지 않습니다."
+            }
+
             field = value
-            this.levels = this.calculateLevels()
         }
 
-    /**
-     * The range of random deviation to apply around the `default` value.
-     * When accessed, this property returns a randomized value based on the formula:
-     * `default ± (this.random * multiplier)`.
-     */
     @Config
-    var random: Int = 0
-        get() = default + ((Random.nextFloat() * 2 * field - field) * Random.nextFloat()).toInt()
+    @RangeInt(min = 1)
+    var max: Int = 1
+        set(value) {
+            val maxRandomEstimate = this.default.add(this.random)
+            val maxStat = this.calculateLevels(max = value).last()
 
-    /**
-     * The growth factor that determines the required value for each level.
-     * A higher weight means the required value for the next level increases more steeply,
-     * making it harder to level up.
-     */
+            val isPositive = value >= 0
+            val isStable = value <= maxRandomEstimate
+            val isMaxExp = value <= maxStat
+
+            require(isPositive || isStable || isMaxExp) {
+                "[Mulgyeolpyo.Stat] 스탯 최대값이 올바르지 않습니다."
+            }
+
+            field = value
+
+            if (this.privateLevels.size < value) {
+                this.privateLevels = this.calculateLevels(max = value)
+            } else {
+                this.privateLevels = this.privateLevels.take(value)
+            }
+        }
+
     @Config
+    @RangeInt(min = 0)
     var weight: Int = 2
         set(value) {
+            val maxRandomEstimate = this.default.add(this.random)
+            val maxStat = this.calculateLevels(weight = value.toLong()).last()
+
+            val isPositive = value > 0
+            val isStable = value <= maxRandomEstimate
+            val isMaxExp = value <= maxStat
+
+            require(isPositive || isStable || isMaxExp) {
+                "[Mulgyeolpyo.Stat] 스탯 가중치가 올바르지 않습니다."
+            }
+
             field = value
-            this.levels = this.calculateLevels()
+
+            this.privateLevels = this.calculateLevels(weight = value.toLong())
         }
 
-    /**
-     * A pre-calculated list of value thresholds required for each level.
-     * The index of the list corresponds to the level.
-     */
-    var levels: List<Int> = calculateLevels()
+    private var privateLevels: List<Long> = calculateLevels()
 
-    private fun calculateLevels(): List<Int> {
-        val levels = mutableListOf<Int>()
+    val levels: List<Long>
+        get() = privateLevels.toList()
 
-        var level = 10
-        var next = this.weight
-        var then = this.weight.pow(level)
+    private fun calculateLevels(
+        max: Int = this.max,
+        weight: Long = this.weight.toLong(),
+    ): List<Long> {
+        val levels = mutableListOf<Long>()
+        var level = 0
 
-        while (level <= this.max) {
-            levels.add(next)
-            next = then
-            level++
-            then = this.weight.pow(level)
+        while (level <= max) {
+            levels.add(weight.pow(level))
+            level += 1
         }
 
         return levels
     }
 
-    /**
-     * Determines the corresponding level for a given stat value.
-     *
-     * If the value is below the first threshold, it returns 0. If the value meets or
-     * exceeds the final threshold, it returns the `max` level.
-     *
-     * @param value The stat value to check.
-     * @return The calculated level, ranging from 0 to `max`.
-     */
-    fun level(value: Long): Int {
-        if (value < this.levels.first()) return 0
-        if (value >= this.levels.last()) return this.max
-
-        for ((level, require) in this.levels.withIndex()) {
-            if (value < require) {
-                return level
-            }
-        }
-        return this.max
+    fun initLevels() {
+        this.privateLevels = this.calculateLevels()
     }
 }
+
+enum class StatConfigField {
+    NAME,
+    DEFAULT,
+    RANDOM,
+    MAX,
+    WEIGHT,
+    LEVELS,
+}
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class StatName(
+    val name: String,
+)
