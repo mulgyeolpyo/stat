@@ -10,9 +10,6 @@
 
 Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sample-complex)**
 
-[**<u>English</u>**](../README.md)　|　[**<u>한국어</u>**](README.md)<br>
-<span style="color: #A8AEB7">_(모든 🌏영문 번역은 AI로 진행되어 부정확한 부분이 존재할 수 있습니다)_</span>
-
 <hr>
 
 **컨텐츠를 위한, 서버를 위한,**<br>
