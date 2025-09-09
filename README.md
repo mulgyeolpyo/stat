@@ -17,7 +17,6 @@ Forked by **[seorin21/paper-sample-complex](https://github.com/seorin21/paper-sa
 
 **For content, for servers,**<br>
 This is a PaperMC library that helps seamlessly manage stats, a commonly used RPG element.
-Of course. Here is the English translation of the provided text, formatted and styled to fit seamlessly into your README file.
 
 ## Feature
 - **GlobalStatManager**: The central hub for managing all stat-related data. <br>
